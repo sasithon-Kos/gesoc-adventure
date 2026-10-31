@@ -150,8 +150,6 @@ function gesocNewPlayerId(){
  else for(let i=0;i<10;i++)bytes[i]=Math.floor(Math.random()*256);
  return 'GS-'+Array.from(bytes,x=>chars[x%chars.length]).join('');
 }
-function gesocRestorePlayer(){try{return JSON.parse(localStorage.getItem('gesoc_player_v8')||'null')}catch(e){return null}}
-function gesocSavePlayer(profile){try{localStorage.setItem('gesoc_player_v8',JSON.stringify(profile))}catch(e){}}
 
 const gesocProvinces=['กรุงเทพมหานคร','กระบี่','กาญจนบุรี','กาฬสินธุ์','กำแพงเพชร','ขอนแก่น','จันทบุรี','ฉะเชิงเทรา','ชลบุรี','ชัยนาท','ชัยภูมิ','ชุมพร','เชียงราย','เชียงใหม่','ตรัง','ตราด','ตาก','นครนายก','นครปฐม','นครพนม','นครราชสีมา','นครศรีธรรมราช','นครสวรรค์','นนทบุรี','นราธิวาส','น่าน','บึงกาฬ','บุรีรัมย์','ปทุมธานี','ประจวบคีรีขันธ์','ปราจีนบุรี','ปัตตานี','พระนครศรีอยุธยา','พะเยา','พังงา','พัทลุง','พิจิตร','พิษณุโลก','เพชรบุรี','เพชรบูรณ์','แพร่','ภูเก็ต','มหาสารคาม','มุกดาหาร','แม่ฮ่องสอน','ยโสธร','ยะลา','ร้อยเอ็ด','ระนอง','ระยอง','ราชบุรี','ลพบุรี','ลำปาง','ลำพูน','เลย','ศรีสะเกษ','สกลนคร','สงขลา','สตูล','สมุทรปราการ','สมุทรสงคราม','สมุทรสาคร','สระแก้ว','สระบุรี','สิงห์บุรี','สุโขทัย','สุพรรณบุรี','สุราษฎร์ธานี','สุรินทร์','หนองคาย','หนองบัวลำภู','อ่างทอง','อำนาจเจริญ','อุดรธานี','อุตรดิตถ์','อุทัยธานี','อุบลราชธานี'];
 function gesocField(label,placeholder,required){
@@ -173,14 +171,12 @@ function gesocSelectField(label,options){
 }
 function gesocFormStart(){
  clearPanel();panel.append(el('h2','🌱 ลงทะเบียนผู้เล่น'),el('p','เล่นซ้ำได้ โดยคะแนนจัดอันดับจะใช้รอบที่ดีที่สุดของรหัสผู้เล่นแต่ละคน'));
- const previous=gesocRestorePlayer();
  const idfield=gesocField('รหัสผู้เล่น (ใช้รหัสเดิม หรือเว้นว่างเพื่อสร้างใหม่)','เช่น GS-ABCDEFG234',false);
- idfield.input.value=previous?.playerId||'';idfield.input.autocomplete='off';
+ idfield.input.value='';idfield.input.autocomplete='off';
  const province=gesocSelectField('จังหวัด *',gesocProvinces);
  const school=gesocField('ชื่อโรงเรียน *','เช่น โรงเรียนองครักษ์',true);
  const nick=gesocField('ชื่อเล่นสำหรับแสดงอันดับ *','เช่น ฟ้า',true);
- if(previous){province.select.value=previous.province||'';school.input.value=previous.school||'';nick.input.value=previous.nickname||'';}
- const note=el('p','รหัสจะถูกจำไว้บนอุปกรณ์นี้ กรุณาจดรหัสไว้ หากเปลี่ยนมือถือให้กรอกรหัสเดิม','muted');note.style.fontSize='13px';
+ const note=el('p','ทุกช่องเริ่มว่างทุกครั้ง • ผู้เล่นเดิมกรอกรหัสเดิมเพื่อรักษาคะแนนสูงสุด • ผู้เล่นใหม่เว้นว่างเพื่อรับรหัสใหม่ (จดรหัสไว้ด้วย)','muted');note.style.fontSize='13px';
  panel.append(idfield.wrap,province.wrap,school.wrap,nick.wrap,note);
  const err=el('p','','muted');err.style.color='#b91c1c';panel.append(err);
  panel.append(button('🎮 เริ่มผจญภัย',()=>{
@@ -191,7 +187,7 @@ function gesocFormStart(){
   if(sc.length<3){err.textContent='โปรดกรอกชื่อโรงเรียน';school.input.focus();return}
   if(!ni){err.textContent='โปรดกรอกชื่อเล่น';nick.input.focus();return}
   gesocPlayerId=raw||gesocNewPlayerId();gesocProvince=pv;gesocSchool=sc;gesocNickname=ni;
-  gesocSavePlayer({playerId:gesocPlayerId,province:pv,school:sc,nickname:ni});newGame();
+  newGame();
   const idBadge=document.getElementById('gesocPlayerBadge');if(idBadge)idBadge.textContent='🪪 '+gesocPlayerId;
  },'btn primary'));
 }
@@ -303,6 +299,7 @@ function endScreen(win){
  panel.append(el('h2',win?'🏆 ภารกิจ Gesoc สำเร็จ!':'💔 พลังหมดแล้ว'),el('p',`คะแนนจริง ${score} คะแนน`),el('p',`รหัสผู้เล่น: ${gesocPlayerId}`),el('p',`ชื่อเล่น: ${gesocNickname||'ไม่ระบุ'} • โรงเรียน: ${gesocSchool} • จังหวัด: ${gesocProvince}`));
  gesocSubmit(win?'completed':'gameover',win?6:li);
  panel.append(button('↻ เล่นใหม่',()=>{if(gesocSchool)newGame();else gesocFormStart()},'btn primary'));
+ panel.append(button('👤 เปลี่ยนผู้เล่น / กรอกข้อมูลใหม่',()=>{gesocPlayerId='';gesocSchool='';gesocProvince='';gesocNickname='';gesocFormStart()},'btn'));
 }
 
 function emoji(txt,x,y,size=33){ctx.font=`${size}px sans-serif`;ctx.textAlign='center';ctx.fillText(txt,x,y)}
