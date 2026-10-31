@@ -198,7 +198,22 @@ function gesocSubmit(status,completed){
  .catch(()=>{gesocSaved=false;msg.textContent='ส่งคะแนนไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ต';panel.append(button('↻ ส่งคะแนนอีกครั้ง',()=>{msg.remove();gesocSubmit(status,completed)},'btn primary'));});
 }
 function newGame(){if(gesocSchool){gesocRunId="gesoc-"+(crypto.randomUUID?crypto.randomUUID():Date.now()+"-"+Math.random().toString(36).slice(2));gesocStartTime=Date.now();gesocSaved=false;}unlockAudio();li=0;score=0;lives=3;playerAnswers={social:0,culture:0};keys.left=false;keys.right=false;prepareLevel()}
-function startScreen(){clearPanel();panel.append(el('p','🌱 ยินดีต้อนรับสู่โลกของน้อง Gesoc','eyebrow'),el('h2','ผจญภัยไปกับน้อง Gesoc'),el('p','สำรวจพื้นที่ จัดการน้ำ ดูแลสิ่งแวดล้อม พัฒนาชุมชน และวิเคราะห์ข้อมูล ผ่าน 6 ด่านที่ตัวเอกเปลี่ยนไปตามบทบาท พร้อมฉากหลังที่กลมกลืนกับตัวละคร'));panel.append(button('🎮 เริ่มผจญภัย',gesocFormStart,'btn primary'));panel.append(el('p','6 ด่านเพิ่มความยาก: ศัตรูเดินลาดตระเวน หนาม โดรนบิน เลเซอร์เปิด–ปิด หัวใจเพิ่มชีวิต โล่ และธงเส้นชัย • กระโดดสองชั้นและพุ่งตัวได้','muted'))}
+function startScreen(){
+ clearPanel();
+ panel.append(el('p','🌱 ยินดีต้อนรับสู่โลกของน้อง Gesoc','eyebrow'));
+ panel.append(el('h2','ผจญภัยไปกับน้อง Gesoc'));
+ panel.append(el('p','ออกผจญภัยผ่าน 6 ด่าน สำรวจพื้นที่ เรียนรู้ชุมชนและสิ่งแวดล้อม เก็บคะแนน และตอบคำถามเพื่อปลดล็อกด่านถัดไป'));
+ panel.append(button('🎮 เริ่มผจญภัย',gesocFormStart,'btn primary'));
+ const guide=el('div','','gesoc-howto');
+ guide.style.cssText='margin-top:14px;border-radius:15px;background:#eff7ff;padding:13px 16px;color:#23415d;font-size:14px;line-height:1.7';
+ guide.append(el('strong','🎮 วิธีเล่น'));
+ guide.append(el('p','มือถือ: ◀ ▶ เดิน | ⬆ กระโดด (กดสองครั้งเพื่อกระโดดสองชั้น) | ⚡ พุ่ง | 🦶 ถีบกลางอากาศ | 🛡️ ใช้โล่'));
+ guide.append(el('p','คอมพิวเตอร์: A/D หรือ ←/→ เดิน | Space กระโดด | Z พุ่ง | K ถีบกลางอากาศ | X ใช้โล่'));
+ guide.append(el('p','เก็บเหรียญเพื่อเพิ่มคะแนน หลบหลุมและปีศาจ ใช้ท่ากระโดดถีบโจมตี ไปถึงธงเส้นชัยแล้วตอบคำถามเพื่อเข้าสู่ด่านต่อไป'));
+ for(const p of guide.querySelectorAll('p'))p.style.cssText='margin:6px 0';
+ panel.append(guide);
+}
+
 function jump(){
  if(locked||!player||player.jumps>=2)return;
  const isSecond=player.jumps===1;
