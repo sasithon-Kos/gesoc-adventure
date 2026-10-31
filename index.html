@@ -21,7 +21,7 @@ canvas{box-shadow:0 18px 42px #09192c80}
 </style>
 </head>
 <body>
-<header><h1>🌱 ผจญภัยไปกับน้อง Gesoc</h1><p class="sub">เรียนรู้ภูมิสารสนเทศ ชุมชน วัฒนธรรม และสิ่งแวดล้อม • 6 ภารกิจ</p><div id="gesocPlayerBadge" style="font-size:13px;color:#e4f8e7;text-align:center;padding:3px"></div></header>
+<header><h1>🌱 ผจญภัยไปกับน้อง Gesoc</h1><p class="sub">เรียนรู้ภูมิสารสนเทศ ชุมชน วัฒนธรรม และสิ่งแวดล้อม • 6 ภารกิจ</p></header>
 <div class="hud"><span id="levelText">ด่าน 1/6</span><span id="gesocName">🌱 Gesoc นักสำรวจ</span><span id="lifeText">❤️❤️❤️</span><span id="scoreText">🪙 0 คะแนน</span></div>
 <canvas id="game" width="960" height="500" aria-label="เกมผจญภัยไปกับน้อง Gesoc"></canvas>
 <div class="controls"><div class="pad"><button type="button" id="left" class="ctrl" aria-label="เดินซ้าย">◀</button><button type="button" id="right" class="ctrl" aria-label="เดินขวา">▶</button></div><div class="right-pad"><button type="button" id="dash" class="ctrl" aria-label="พุ่งตัว">⚡ พุ่ง</button><button type="button" id="kick" class="ctrl" aria-label="กระโดดถีบปีศาจ">🦶 ถีบ</button><button type="button" id="skill" class="ctrl" aria-label="ใช้โล่ป้องกัน">🛡️ โล่</button><button type="button" id="jump" class="ctrl">⬆ กระโดด</button></div></div>
@@ -169,27 +169,38 @@ function gesocSelectField(label,options){
  options.forEach(name=>{const op=document.createElement('option');op.value=name;op.textContent=name;sel.append(op)});
  wrap.append(sel);return {wrap,select:sel};
 }
+function gesocAutoPlayerId(province,school,nickname){
+ // Reuse IDs only for the exact same profile on this device, without pre-filling fields.
+ const key='gesoc_profiles_v9';
+ const norm=v=>String(v||'').normalize('NFC').trim().replace(/\s+/g,' ').toLocaleLowerCase('th-TH');
+ const signature=[province,school,nickname].map(norm).join('||');
+ try {
+  const stored=JSON.parse(localStorage.getItem(key)||'{}');
+  const profiles=stored&&typeof stored==='object'&&!Array.isArray(stored)?stored:{};
+  const old=profiles[signature];
+  if(/^GS-[A-HJ-NP-Z2-9]{10}$/.test(old||'')) return old;
+  const id=gesocNewPlayerId(); profiles[signature]=id;
+  localStorage.setItem(key,JSON.stringify(profiles));return id;
+ } catch(e){return gesocNewPlayerId()}
+}
 function gesocFormStart(){
- clearPanel();panel.append(el('h2','🌱 ลงทะเบียนผู้เล่น'),el('p','เล่นซ้ำได้ โดยคะแนนจัดอันดับจะใช้รอบที่ดีที่สุดของรหัสผู้เล่นแต่ละคน'));
- const idfield=gesocField('รหัสผู้เล่น (ใช้รหัสเดิม หรือเว้นว่างเพื่อสร้างใหม่)','เช่น GS-ABCDEFG234',false);
- idfield.input.value='';idfield.input.autocomplete='off';
+ clearPanel();
+ panel.append(el('h2','🌱 พร้อมผจญภัยหรือยัง?'),el('p','เลือกจังหวัด กรอกโรงเรียนและชื่อเล่น แล้วเริ่มเกมได้เลย!'));
  const province=gesocSelectField('จังหวัด *',gesocProvinces);
  const school=gesocField('ชื่อโรงเรียน *','เช่น โรงเรียนองครักษ์',true);
- const nick=gesocField('ชื่อเล่นสำหรับแสดงอันดับ *','เช่น ฟ้า',true);
- const note=el('p','ทุกช่องเริ่มว่างทุกครั้ง • ผู้เล่นเดิมกรอกรหัสเดิมเพื่อรักษาคะแนนสูงสุด • ผู้เล่นใหม่เว้นว่างเพื่อรับรหัสใหม่ (จดรหัสไว้ด้วย)','muted');note.style.fontSize='13px';
- panel.append(idfield.wrap,province.wrap,school.wrap,nick.wrap,note);
+ const nick=gesocField('ชื่อเล่น *','ชื่อที่จะแสดงบนตารางอันดับ',true);
+ panel.append(province.wrap,school.wrap,nick.wrap);
  const err=el('p','','muted');err.style.color='#b91c1c';panel.append(err);
- panel.append(button('🎮 เริ่มผจญภัย',()=>{
-  const raw=idfield.input.value.trim().toUpperCase();
+ panel.append(button('🎮 เล่นเลย!',()=>{
   const pv=province.select.value.trim(),sc=school.input.value.trim(),ni=nick.input.value.trim();
-  if(raw && !/^GS-[A-HJ-NP-Z2-9]{10}$/.test(raw)){err.textContent='รหัสไม่ถูกต้อง กรุณาใช้รหัสเดิมหรือเว้นว่างเพื่อสร้างใหม่';return}
-  if(!pv){err.textContent='โปรดเลือกจังหวัด';province.select.focus();return}
-  if(sc.length<3){err.textContent='โปรดกรอกชื่อโรงเรียน';school.input.focus();return}
-  if(!ni){err.textContent='โปรดกรอกชื่อเล่น';nick.input.focus();return}
-  gesocPlayerId=raw||gesocNewPlayerId();gesocProvince=pv;gesocSchool=sc;gesocNickname=ni;
+  if(!pv){err.textContent='กรุณาเลือกจังหวัด';province.select.focus();return}
+  if(sc.length<3){err.textContent='กรุณากรอกชื่อโรงเรียน';school.input.focus();return}
+  if(!ni){err.textContent='กรุณากรอกชื่อเล่น';nick.input.focus();return}
+  gesocPlayerId=gesocAutoPlayerId(pv,sc,ni);
+  gesocProvince=pv;gesocSchool=sc;gesocNickname=ni;
   newGame();
-  const idBadge=document.getElementById('gesocPlayerBadge');if(idBadge)idBadge.textContent='🪪 '+gesocPlayerId;
  },'btn primary'));
+ panel.append(el('p','ไม่ต้องสมัครสมาชิกหรือกรอกรหัส ระบบบันทึกคะแนนให้อัตโนมัติ','muted'));
 }
 function gesocSubmit(status,completed){
  if(gesocSaved || !gesocSchool || !gesocRunId)return;
@@ -296,7 +307,7 @@ function quizScreen(){
 }
 function endScreen(win){
  locked=true;clearPanel();
- panel.append(el('h2',win?'🏆 ภารกิจ Gesoc สำเร็จ!':'💔 พลังหมดแล้ว'),el('p',`คะแนนจริง ${score} คะแนน`),el('p',`รหัสผู้เล่น: ${gesocPlayerId}`),el('p',`ชื่อเล่น: ${gesocNickname||'ไม่ระบุ'} • โรงเรียน: ${gesocSchool} • จังหวัด: ${gesocProvince}`));
+ panel.append(el('h2',win?'🏆 ภารกิจ Gesoc สำเร็จ!':'💔 พลังหมดแล้ว'),el('p',`คะแนนจริง ${score} คะแนน`),el('p',`ชื่อเล่น: ${gesocNickname||'ไม่ระบุ'} • โรงเรียน: ${gesocSchool} • จังหวัด: ${gesocProvince}`));
  gesocSubmit(win?'completed':'gameover',win?6:li);
  panel.append(button('↻ เล่นใหม่',()=>{if(gesocSchool)newGame();else gesocFormStart()},'btn primary'));
  panel.append(button('👤 เปลี่ยนผู้เล่น / กรอกข้อมูลใหม่',()=>{gesocPlayerId='';gesocSchool='';gesocProvince='';gesocNickname='';gesocFormStart()},'btn'));
