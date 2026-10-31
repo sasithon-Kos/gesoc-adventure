@@ -18,15 +18,46 @@ canvas{box-shadow:0 18px 42px #09192c80}
 .controls{align-items:center}.right-pad{display:flex;gap:10px}
 .hud span{background:#ffffff2e}
 @media(max-width:500px){.right-pad{gap:6px}#skill{min-width:72px;font-size:13px}#jump{min-width:98px;font-size:15px}.ctrl{min-width:59px;min-height:62px}.pad{gap:6px}}
+
+/* Mobile controls fix: keep every game button inside phone viewport. */
+@media (max-width:680px){
+  html,body{max-width:100%;overflow-x:hidden}
+  header{padding:10px 8px 5px}
+  header h1{font-size:clamp(20px,5.2vw,27px)}
+  .sub{font-size:12px;line-height:1.45}
+  .hud{justify-content:center;gap:5px;margin:5px auto;padding:0 6px;font-size:11px}
+  .hud span{padding:5px 8px;border-radius:12px}
+  canvas{width:calc(100% - 8px);max-width:960px;border-width:2px;border-radius:12px}
+  .controls{display:grid;grid-template-columns:minmax(0,1fr);width:100%;max-width:100%;gap:10px;padding:0 8px;margin:12px auto 4px}
+  .controls .pad{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;min-width:0;width:100%}
+  .controls .right-pad{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;min-width:0;width:100%}
+  .controls .ctrl,.controls #dash,.controls #kick,.controls #skill,.controls #jump{
+    box-sizing:border-box;min-width:0;width:100%;min-height:58px;max-width:100%;
+    padding:6px 1px;line-height:1.15;font-size:clamp(12px,3.6vw,16px);
+    border-radius:14px;white-space:normal;overflow-wrap:normal
+  }
+  .controls .pad .ctrl{min-height:55px;font-size:24px}
+  .controls #jump{background:#ffd36c;box-shadow:0 5px 0 #bc8730;font-size:clamp(12px,3.6vw,16px);font-weight:900}
+  .controls #kick{background:#d9ebff}
+  .tools{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin:12px 6px}
+  .tools .small{font-size:12px;padding:9px 12px}
+  .note{font-size:11px;line-height:1.6;padding:0 12px 18px}
+}
+@media (max-width:350px){
+  .controls{padding:0 5px}
+  .controls .right-pad{gap:4px}
+  .controls .ctrl,.controls #dash,.controls #kick,.controls #skill,.controls #jump{font-size:11px;min-height:54px}
+  .tools .small{font-size:11px;padding:8px 10px}
+}
 </style>
 </head>
 <body>
 <header><h1>🌱 ผจญภัยไปกับน้อง Gesoc</h1><p class="sub">เรียนรู้ภูมิสารสนเทศ ชุมชน วัฒนธรรม และสิ่งแวดล้อม • 6 ภารกิจ</p></header>
 <div class="hud"><span id="levelText">ด่าน 1/6</span><span id="gesocName">🌱 Gesoc นักสำรวจ</span><span id="lifeText">❤️❤️❤️</span><span id="scoreText">🪙 0 คะแนน</span></div>
 <canvas id="game" width="960" height="500" aria-label="เกมผจญภัยไปกับน้อง Gesoc"></canvas>
-<div class="controls"><div class="pad"><button type="button" id="left" class="ctrl" aria-label="เดินซ้าย">◀</button><button type="button" id="right" class="ctrl" aria-label="เดินขวา">▶</button></div><div class="right-pad"><button type="button" id="dash" class="ctrl" aria-label="พุ่งตัว">⚡ พุ่ง</button><button type="button" id="kick" class="ctrl" aria-label="กระโดดถีบปีศาจ">🦶 ถีบ</button><button type="button" id="skill" class="ctrl" aria-label="ใช้โล่ป้องกัน">🛡️ โล่</button><button type="button" id="jump" class="ctrl">⬆ กระโดด</button></div></div>
+<div class="controls"><div class="pad"><button type="button" id="left" class="ctrl" aria-label="เดินซ้าย">◀</button><button type="button" id="right" class="ctrl" aria-label="เดินขวา">▶</button></div><div class="right-pad"><button type="button" id="dash" class="ctrl" aria-label="พุ่งตัว">⚡ พุ่ง</button><button type="button" id="kick" class="ctrl" aria-label="เตะโจมตีปีศาจ">💥 เตะ</button><button type="button" id="jump" class="ctrl">⬆ กระโดด</button></div></div>
 <div class="tools"><button class="small" type="button" id="restart">↻ เริ่มใหม่</button><button class="small" type="button" id="how">? วิธีเล่น</button><button class="small" type="button" id="sound" aria-pressed="true">🔊 เปิดเสียง</button></div>
-<div class="note">มือถือ: ◀ ▶ กระโดดสองชั้น 🦶ถีบ (กดครั้งเดียวกระโดดพุ่งถีบ) ⚡พุ่ง และโล่ • คอมพิวเตอร์: A/D, Space ×2, Z พุ่ง, K ถีบกระโดด, X โล่ • By : Sasi</div>
+<div class="note">มือถือ: ◀ ▶ กระโดดสองชั้น 💥 เตะ (กดครั้งเดียวกระโดดพุ่งโจมตี) ⚡พุ่ง • โล่ทำงานอัตโนมัติเมื่อมีไอเท็ม • คอมพิวเตอร์: A/D, Space ×2, Z พุ่ง, K เตะ • By : Sasi</div>
 <div id="overlay"><section class="panel" id="panel"></section></div>
 <script>
 'use strict';
@@ -116,7 +147,7 @@ const keys={left:false,right:false};
 function el(tag,txt,cls){const e=document.createElement(tag);if(txt!==undefined)e.textContent=txt;if(cls)e.className=cls;return e}
 function button(txt,fn,cls='btn'){const b=el('button',txt,cls);b.type='button';b.addEventListener('click',fn);return b}
 function clearPanel(){panel.replaceChildren();overlay.classList.remove('hidden')}
-function setHUD(){$('levelText').textContent=`${levels[li].icon} ด่าน ${li+1}/6: ${levels[li].name}${cpActive?' • ✓ จุดพัก':''}`;$('lifeText').textContent='❤️'.repeat(Math.max(0,lives));$('scoreText').textContent=`🪙 ${score} คะแนน • 🔥 ${coinCombo} • 🛡️ ${shieldCharge}`;$('skill').textContent=shieldTime>0?'🛡️ เปิดอยู่':`🛡️ ${shieldCharge}`}
+function setHUD(){$('levelText').textContent=`${levels[li].icon} ด่าน ${li+1}/6: ${levels[li].name}${cpActive?' • ✓ จุดพัก':''}`;$('lifeText').textContent='❤️'.repeat(Math.max(0,lives));$('scoreText').textContent=`🪙 ${score} คะแนน • 🔥 ${coinCombo} • 🛡️ ${shieldCharge}`}
 function onGround(x){return x>=0&&x<WORLD&&!designs[li].gaps.some(g=>x>=g[0]&&x<g[1])}
 function prepareLevel(){
  player={x:60,y:FLOOR-46,w:46,h:46,vx:0,vy:0,ground:false,inv:0,jumps:0};
@@ -231,9 +262,9 @@ function startScreen(){
  const guide=el('div','','gesoc-howto');
  guide.style.cssText='margin-top:14px;border-radius:15px;background:#eff7ff;padding:13px 16px;color:#23415d;font-size:14px;line-height:1.7';
  guide.append(el('strong','🎮 วิธีเล่น'));
- guide.append(el('p','มือถือ: ◀ ▶ เดิน | ⬆ กระโดด (กดสองครั้งเพื่อกระโดดสองชั้น) | ⚡ พุ่ง | 🦶 ถีบกระโดดโจมตี | 🛡️ ใช้โล่'));
- guide.append(el('p','คอมพิวเตอร์: A/D หรือ ←/→ เดิน | Space กระโดด | Z พุ่ง | K ถีบกระโดด | X ใช้โล่'));
- guide.append(el('p','เก็บเหรียญเพื่อเพิ่มคะแนน หลบหลุมและปีศาจ ใช้ท่ากระโดดถีบโจมตี ไปถึงธงเส้นชัยแล้วตอบคำถามเพื่อเข้าสู่ด่านต่อไป'));
+ guide.append(el('p','มือถือ: ◀ ▶ เดิน | ⬆ กระโดด (กดสองครั้งเพื่อกระโดดสองชั้น) | ⚡ พุ่ง | 💥 เตะโจมตี (กดครั้งเดียว) | 🛡️ เก็บโล่เพื่อป้องกันอัตโนมัติ'));
+ guide.append(el('p','คอมพิวเตอร์: A/D หรือ ←/→ เดิน | Space กระโดด | Z พุ่ง | K เตะ'));
+ guide.append(el('p','เก็บเหรียญเพื่อเพิ่มคะแนน หลบหลุมและปีศาจ ใช้ท่ากระโดดเตะโจมตี ไปถึงธงเส้นชัยแล้วตอบคำถามเพื่อเข้าสู่ด่านต่อไป'));
  for(const p of guide.querySelectorAll('p'))p.style.cssText='margin:6px 0';
  panel.append(guide);
 }
@@ -262,11 +293,11 @@ function kickDefeat(target,points){
  for(let i=0;i<11;i++)sparkles.push({x:target.x+target.w/2,y:target.y+target.h/2,vx:(Math.random()-.5)*8,vy:(Math.random()-.5)*6,life:26});
  sfx('stomp');setHUD();
 }
-function useShield(){if(locked||shieldCharge<=0||shieldTime>0)return;shieldCharge--;shieldTime=180;sfx('power');setHUD()}
+
 function respawn(){player.x=cpX;player.y=FLOOR-135;player.vy=0;player.jumps=0;player.inv=105}
 
 function hit(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y}
-function hurt(){if(player.inv>0||locked)return;if(shieldTime>0){shieldTime=0;player.inv=45;sfx('power');return}lives--;sfx(lives<=0?'death':'hit');setHUD();if(lives<=0){locked=true;endScreen(false);return}respawn()}
+function hurt(){if(player.inv>0||locked)return;if(shieldCharge>0){shieldCharge--;player.inv=60;sfx('power');setHUD();return}lives--;sfx(lives<=0?'death':'hit');setHUD();if(lives<=0){locked=true;endScreen(false);return}respawn()}
 function update(dt){if(locked)return;frame+=dt;
  player.inv=Math.max(0,player.inv-dt);shieldTime=Math.max(0,shieldTime-dt);dashCooldown=Math.max(0,dashCooldown-dt);dashFrames=Math.max(0,dashFrames-dt);kickFrames=Math.max(0,kickFrames-dt);kickCooldown=Math.max(0,kickCooldown-dt);
  if(!cpActive&&player.x>safeCheckpoint()){cpX=safeCheckpoint();cpActive=true;shieldCharge=Math.min(2,shieldCharge+1);sfx('checkpoint');setHUD()}
@@ -477,8 +508,8 @@ function draw(){
   ctx.restore();
 }
 let last=0;function loop(t){const dt=Math.min(2,(t-last)/16.667||1);last=t;update(dt);draw();requestAnimationFrame(loop)}
-function bind(id,key){const b=$(id);b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture(e.pointerId);b.classList.add('pressed');if(key==='jump')jump();else keys[key]=true});function release(e){e.preventDefault();b.classList.remove('pressed');if(key!=='jump')keys[key]=false}b.addEventListener('pointerup',release);b.addEventListener('pointercancel',release);b.addEventListener('lostpointercapture',()=>{b.classList.remove('pressed');if(key!=='jump')keys[key]=false})}bind('left','left');bind('right','right');bind('jump','jump');$('dash').addEventListener('pointerdown',e=>{e.preventDefault();dash()});$('skill').addEventListener('click',useShield);$('kick').addEventListener('pointerdown',e=>{e.preventDefault();airKick()});
-window.addEventListener('keydown',e=>{if(e.target.closest('input, textarea, select, [contenteditable="true"]'))return;if(['ArrowLeft','ArrowRight','Space','ArrowUp','KeyA','KeyD','KeyW','KeyX','KeyK'].includes(e.code))e.preventDefault();if(['ArrowLeft','KeyA'].includes(e.code))keys.left=true;if(['ArrowRight','KeyD'].includes(e.code))keys.right=true;if(['Space','ArrowUp','KeyW'].includes(e.code)&&!e.repeat)jump();if(e.code==='KeyZ'&&!e.repeat)dash();if(e.code==='KeyX'&&!e.repeat)useShield();if(e.code==='KeyK'&&!e.repeat)airKick()});window.addEventListener('keyup',e=>{if(e.target.closest('input, textarea, select, [contenteditable="true"]'))return;if(['ArrowLeft','KeyA'].includes(e.code))keys.left=false;if(['ArrowRight','KeyD'].includes(e.code))keys.right=false});window.addEventListener('blur',()=>{keys.left=false;keys.right=false});$('restart').onclick=()=>{if(confirm('ต้องการเริ่มเกมใหม่?'))newGame()};$('how').onclick=startScreen;
+function bind(id,key){const b=$(id);b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture(e.pointerId);b.classList.add('pressed');if(key==='jump')jump();else keys[key]=true});function release(e){e.preventDefault();b.classList.remove('pressed');if(key!=='jump')keys[key]=false}b.addEventListener('pointerup',release);b.addEventListener('pointercancel',release);b.addEventListener('lostpointercapture',()=>{b.classList.remove('pressed');if(key!=='jump')keys[key]=false})}bind('left','left');bind('right','right');bind('jump','jump');$('dash').addEventListener('pointerdown',e=>{e.preventDefault();dash()});$('kick').addEventListener('pointerdown',e=>{e.preventDefault();airKick()});
+window.addEventListener('keydown',e=>{if(e.target.closest('input, textarea, select, [contenteditable="true"]'))return;if(['ArrowLeft','ArrowRight','Space','ArrowUp','KeyA','KeyD','KeyW','KeyK'].includes(e.code))e.preventDefault();if(['ArrowLeft','KeyA'].includes(e.code))keys.left=true;if(['ArrowRight','KeyD'].includes(e.code))keys.right=true;if(['Space','ArrowUp','KeyW'].includes(e.code)&&!e.repeat)jump();if(e.code==='KeyZ'&&!e.repeat)dash();if(e.code==='KeyK'&&!e.repeat)airKick()});window.addEventListener('keyup',e=>{if(e.target.closest('input, textarea, select, [contenteditable="true"]'))return;if(['ArrowLeft','KeyA'].includes(e.code))keys.left=false;if(['ArrowRight','KeyD'].includes(e.code))keys.right=false});window.addEventListener('blur',()=>{keys.left=false;keys.right=false});$('restart').onclick=()=>{if(confirm('ต้องการเริ่มเกมใหม่?'))newGame()};$('how').onclick=startScreen;
 prepareLevel();locked=true;startScreen();requestAnimationFrame(loop);
 </script>
 </body>
