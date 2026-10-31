@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>ผจญภัยไปกับน้อง Gesoc | เกมการเรียนรู้</title>
 <style>
-:root{--navy:#162842;--gold:#ffcf65;--ink:#17304e}*{box-sizing:border-box}body{margin:0;background:linear-gradient(150deg,#152c4a,#274e69);color:white;font-family:system-ui,-apple-system,"Noto Sans Thai",sans-serif;text-align:center}header{padding:12px 10px 8px}header h1{margin:0;font-size:clamp(20px,4vw,29px)}.sub{font-size:13px;opacity:.85;margin:4px}.hud{max-width:960px;margin:8px auto;display:flex;justify-content:space-between;gap:6px;flex-wrap:wrap;padding:0 10px;font-weight:750}.hud span{background:#ffffff1e;border:1px solid #ffffff3a;border-radius:16px;padding:8px 12px}canvas{display:block;width:min(100%,960px);height:auto;margin:auto;border:3px solid #ffffff32;border-radius:14px;background:#a7ddf8;touch-action:none}.controls{display:flex;justify-content:space-between;max-width:960px;gap:8px;margin:12px auto 4px;padding:0 14px}.pad{display:flex;gap:11px}.ctrl{touch-action:none;user-select:none;-webkit-user-select:none;border:0;border-radius:17px;background:#e3eefc;color:#17304e;min-width:76px;min-height:69px;font-size:26px;font-weight:900;box-shadow:0 5px 0 #7294bb}.ctrl.pressed{transform:translateY(4px);box-shadow:0 1px 0 #7294bb}#jump{background:#ffcc63;min-width:124px;box-shadow:0 5px 0 #be8730;font-size:18px}.tools{display:flex;justify-content:center;gap:10px;margin:15px}.small{border:1px solid #ffffff65;background:#ffffff1b;color:#fff;padding:11px 17px;border-radius:12px;font-weight:bold}.note{font-size:12px;opacity:.8;padding:0 10px 20px}#overlay{position:fixed;inset:0;background:#0b1b31dd;display:flex;align-items:center;justify-content:center;padding:16px;z-index:5;overflow-y:auto}.panel{background:#fff;color:var(--ink);border-radius:22px;padding:24px;max-width:510px;width:100%;text-align:left;box-shadow:0 15px 40px #0005}.panel h2{text-align:center;margin:5px 0 10px}.panel p{line-height:1.55}.btn{display:block;width:100%;border:0;border-radius:12px;padding:14px 12px;margin:10px 0;font-size:16px;font-weight:700;background:#e9f2ff;color:#17304e;text-align:left}.btn.primary{background:#ffcc63;text-align:center}.btn:disabled{opacity:.6}.eyebrow{text-align:center;font-size:12px;color:#6b7890;font-weight:700}.feedback{font-weight:700;color:#9b3c2b}.pill{display:inline-block;background:#e6f5e7;color:#267348;padding:7px 10px;border-radius:20px;font-size:12px;font-weight:700}.result{background:#f0f6ff;padding:14px;border-radius:14px}.link{color:#164fb0;overflow-wrap:anywhere}.muted{color:#5c6d82;font-size:12px}.hidden{display:none!important} @media(max-width:500px){.hud{font-size:12px}.hud span{padding:6px 8px}.panel{padding:17px}.ctrl{min-width:69px}.controls{padding:0 10px}}
+:root{--navy:#162842;--gold:#ffcf65;--ink:#17304e}*{box-sizing:border-box}body{margin:0;background:linear-gradient(150deg,#152c4a,#274e69);color:white;font-family:system-ui,-apple-system,"Noto Sans Thai",sans-serif;text-align:center}header{padding:12px 10px 8px}header h1{margin:0;font-size:clamp(20px,4vw,29px)}.sub{font-size:13px;opacity:.85;margin:4px}.hud{max-width:960px;margin:8px auto;display:flex;justify-content:space-between;gap:6px;flex-wrap:wrap;padding:0 10px;font-weight:750}.hud span{background:#ffffff1e;border:1px solid #ffffff3a;border-radius:16px;padding:8px 12px}canvas{display:block;width:min(100%,960px);height:auto;margin:auto;border:3px solid #ffffff32;border-radius:14px;background:#a7ddf8;touch-action:none}.controls{display:flex;justify-content:space-between;max-width:960px;gap:8px;margin:12px auto 4px;padding:0 14px}.pad{display:flex;gap:11px}.ctrl{touch-action:none;user-select:none;-webkit-user-select:none;border:0;border-radius:17px;background:#e3eefc;color:#17304e;min-width:76px;min-height:69px;font-size:26px;font-weight:900;box-shadow:0 5px 0 #7294bb;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;line-height:1.05}.ctrl .ico{display:block;font-size:34px;line-height:1}.ctrl .lbl{display:block;font-size:16px;font-weight:900;line-height:1.05}.ctrl.pressed{transform:translateY(4px);box-shadow:0 1px 0 #7294bb}#jump{background:#ffcc63;min-width:124px;box-shadow:0 5px 0 #be8730}.tools{display:flex;justify-content:center;gap:10px;margin:15px}.small{border:1px solid #ffffff65;background:#ffffff1b;color:#fff;padding:11px 17px;border-radius:12px;font-weight:bold}.note{font-size:12px;opacity:.8;padding:0 10px 20px}#overlay{position:fixed;inset:0;background:#0b1b31dd;display:flex;align-items:center;justify-content:center;padding:16px;z-index:5;overflow-y:auto}.panel{background:#fff;color:var(--ink);border-radius:22px;padding:24px;max-width:510px;width:100%;text-align:left;box-shadow:0 15px 40px #0005}.panel h2{text-align:center;margin:5px 0 10px}.panel p{line-height:1.55}.btn{display:block;width:100%;border:0;border-radius:12px;padding:14px 12px;margin:10px 0;font-size:16px;font-weight:700;background:#e9f2ff;color:#17304e;text-align:left}.btn.primary{background:#ffcc63;text-align:center}.btn:disabled{opacity:.6}.eyebrow{text-align:center;font-size:12px;color:#6b7890;font-weight:700}.feedback{font-weight:700;color:#9b3c2b}.pill{display:inline-block;background:#e6f5e7;color:#267348;padding:7px 10px;border-radius:20px;font-size:12px;font-weight:700}.result{background:#f0f6ff;padding:14px;border-radius:14px}.link{color:#164fb0;overflow-wrap:anywhere}.muted{color:#5c6d82;font-size:12px}.hidden{display:none!important} @media(max-width:500px){.hud{font-size:12px}.hud span{padding:6px 8px}.panel{padding:17px}.ctrl{min-width:69px}.controls{padding:0 10px}}
 
 /* Gesoc Adventure — keep the original responsive layout and controls */
 #dash{background:#ffe68a;min-width:94px;box-shadow:0 5px 0 #b98934;font-size:16px}
@@ -37,8 +37,10 @@ canvas{box-shadow:0 18px 42px #09192c80}
     border-radius:14px;white-space:normal;overflow-wrap:normal
   }
   .controls .pad .ctrl{min-height:55px;font-size:24px}
-  .controls #jump{background:#ffd36c;box-shadow:0 5px 0 #bc8730;font-size:clamp(12px,3.6vw,16px);font-weight:900}
+  .controls #jump{background:#ffd36c;box-shadow:0 5px 0 #bc8730;font-weight:900}
   .controls #kick{background:#d9ebff}
+  .controls .ctrl .ico{font-size:clamp(24px,7vw,34px)}
+  .controls .ctrl .lbl{font-size:clamp(13px,3.8vw,17px)}
   .tools{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin:12px 6px}
   .tools .small{font-size:12px;padding:9px 12px}
   .note{font-size:11px;line-height:1.6;padding:0 12px 18px}
@@ -46,7 +48,9 @@ canvas{box-shadow:0 18px 42px #09192c80}
 @media (max-width:350px){
   .controls{padding:0 5px}
   .controls .right-pad{gap:4px}
-  .controls .ctrl,.controls #dash,.controls #kick,.controls #skill,.controls #jump{font-size:11px;min-height:54px}
+  .controls .ctrl,.controls #dash,.controls #kick,.controls #skill,.controls #jump{min-height:54px}
+  .controls .ctrl .ico{font-size:clamp(24px,8vw,30px)}
+  .controls .ctrl .lbl{font-size:clamp(12px,3.8vw,15px)}
   .tools .small{font-size:11px;padding:8px 10px}
 }
 </style>
@@ -55,9 +59,9 @@ canvas{box-shadow:0 18px 42px #09192c80}
 <header><h1>🌱 ผจญภัยไปกับน้อง Gesoc</h1><p class="sub">เรียนรู้ภูมิสารสนเทศ ชุมชน วัฒนธรรม และสิ่งแวดล้อม • 6 ภารกิจ</p></header>
 <div class="hud"><span id="levelText">ด่าน 1/6</span><span id="gesocName">🌱 Gesoc นักสำรวจ</span><span id="lifeText">❤️❤️❤️</span><span id="scoreText">🪙 0 คะแนน</span></div>
 <canvas id="game" width="960" height="500" aria-label="เกมผจญภัยไปกับน้อง Gesoc"></canvas>
-<div class="controls"><div class="pad"><button type="button" id="left" class="ctrl" aria-label="เดินซ้าย">◀</button><button type="button" id="right" class="ctrl" aria-label="เดินขวา">▶</button></div><div class="right-pad"><button type="button" id="dash" class="ctrl" aria-label="พุ่งตัว">⚡ พุ่ง</button><button type="button" id="kick" class="ctrl" aria-label="เตะโจมตีปีศาจ">💥 เตะ</button><button type="button" id="jump" class="ctrl">⬆ กระโดด</button></div></div>
+<div class="controls"><div class="pad"><button type="button" id="left" class="ctrl" aria-label="เดินซ้าย"><span class="ico">◀</span></button><button type="button" id="right" class="ctrl" aria-label="เดินขวา"><span class="ico">▶</span></button></div><div class="right-pad"><button type="button" id="jump" class="ctrl" aria-label="กระโดด"><span class="ico">⬆</span><span class="lbl">กระโดด</span></button><button type="button" id="dash" class="ctrl" aria-label="พุ่งตัว"><span class="ico">⚡</span><span class="lbl">พุ่ง</span></button><button type="button" id="kick" class="ctrl" aria-label="เตะโจมตีปีศาจ"><span class="ico">💥</span><span class="lbl">เตะ</span></button></div></div>
 <div class="tools"><button class="small" type="button" id="restart">↻ เริ่มใหม่</button><button class="small" type="button" id="how">? วิธีเล่น</button><button class="small" type="button" id="sound" aria-pressed="true">🔊 เปิดเสียง</button></div>
-<div class="note">มือถือ: ◀ ▶ กระโดดสองชั้น 💥 เตะ (กดครั้งเดียวกระโดดพุ่งโจมตี) ⚡พุ่ง • โล่ทำงานอัตโนมัติเมื่อมีไอเท็ม • คอมพิวเตอร์: A/D, Space ×2, Z พุ่ง, K เตะ • By : Sasi</div>
+<div class="note">มือถือ: ◀ ▶ เดิน • ⬆ กระโดดสองชั้น • ⚡ พุ่ง • 💥 เตะ (กดครั้งเดียวกระโดดพุ่งโจมตี) • โล่ทำงานอัตโนมัติเมื่อมีไอเท็ม • คอมพิวเตอร์: A/D, Space ×2, Z พุ่ง, K เตะ • By : Sasi</div>
 <div id="overlay"><section class="panel" id="panel"></section></div>
 <script>
 'use strict';
@@ -262,7 +266,7 @@ function startScreen(){
  const guide=el('div','','gesoc-howto');
  guide.style.cssText='margin-top:14px;border-radius:15px;background:#eff7ff;padding:13px 16px;color:#23415d;font-size:14px;line-height:1.7';
  guide.append(el('strong','🎮 วิธีเล่น'));
- guide.append(el('p','มือถือ: ◀ ▶ เดิน | ⬆ กระโดด (กดสองครั้งเพื่อกระโดดสองชั้น) | ⚡ พุ่ง | 💥 เตะโจมตี (กดครั้งเดียว) | 🛡️ เก็บโล่เพื่อป้องกันอัตโนมัติ'));
+ guide.append(el('p','มือถือ: ◀ ▶ เดิน | ⬆ กระโดด (กดสองครั้งเพื่อกระโดดสองชั้น) | ⚡ พุ่ง | 💥 เตะโจมตี (กดครั้งเดียว) | เก็บโล่เพื่อป้องกันอัตโนมัติ'));
  guide.append(el('p','คอมพิวเตอร์: A/D หรือ ←/→ เดิน | Space กระโดด | Z พุ่ง | K เตะ'));
  guide.append(el('p','เก็บเหรียญเพื่อเพิ่มคะแนน หลบหลุมและปีศาจ ใช้ท่ากระโดดเตะโจมตี ไปถึงธงเส้นชัยแล้วตอบคำถามเพื่อเข้าสู่ด่านต่อไป'));
  for(const p of guide.querySelectorAll('p'))p.style.cssText='margin:6px 0';
