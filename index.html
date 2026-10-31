@@ -53,6 +53,12 @@ canvas{box-shadow:0 18px 42px #09192c80}
   .controls .ctrl .lbl{font-size:clamp(12px,3.8vw,15px)}
   .tools .small{font-size:11px;padding:8px 10px}
 }
+/* Compact post-level quiz optimized for phones */
+#overlay .panel{max-height:calc(100dvh - 28px);overflow-y:auto;overscroll-behavior:contain}
+#overlay .panel .eyebrow{margin:0 0 6px}
+#overlay .panel h3{font-size:clamp(17px,4.5vw,21px);margin:6px 0 10px;line-height:1.4}
+#overlay .panel .feedback{font-size:14px;line-height:1.45;margin:12px 0 4px}
+@media(max-width:500px){#overlay{padding:8px}#overlay .panel{padding:16px 15px;border-radius:18px}#overlay .panel .btn{padding:11px 12px;margin:8px 0;font-size:15px;line-height:1.35}#overlay .panel p{margin:8px 0}}
 </style>
 </head>
 <body>
@@ -343,17 +349,24 @@ function gesocTeacherQuestions(){
  panel.append(button('← กลับหน้าแรก',startScreen,'btn primary'));
 }
 function gesocFinalPrograms(){
- const container=el('div','','gesoc-program-summary');container.style.cssText='background:#eef8f1;border:2px solid #abdfb9;border-radius:18px;padding:16px;margin:12px 0;color:#153e30;line-height:1.65';
- container.append(el('h2','🎓 จำ 2 ชื่อหลักสูตรนี้ให้ได้!'),el('p','วิทยาลัยโพธิวิชชาลัย มหาวิทยาลัยศรีนครินทรวิโรฒ'));
- for(const p of [gesocProgramInfo.social,gesocProgramInfo.culture]){
-  const block=el('div','','gesoc-program-box');block.style.cssText='background:white;border-radius:12px;margin:10px 0;padding:12px';
-  block.append(el('h3',`${p.emoji} ${p.name}`),el('p',p.desc));container.append(block);
- }
- container.append(el('p','🌍 จำง่าย: ภูมิสังคม = คน + ชุมชน + พื้นที่ | ภูมิวัฒนธรรม = วัฒนธรรม + อัตลักษณ์ + พื้นที่'));
- return container;
+ const wrap=el('div','','gesoc-final-poster');
+ wrap.style.cssText='width:100%;margin:8px auto 12px;text-align:center';
+ const img=document.createElement('img');
+ img.src='assets/gesoc_final_poster.png';
+ img.alt='ยินดีด้วย คุณผ่านครบ 6 ด่านแล้ว รู้จักหลักสูตรการจัดการภูมิสังคมและการจัดการภูมิวัฒนธรรม';
+ img.loading='eager';img.decoding='async';
+ img.style.cssText='display:block;width:100%;height:auto;border-radius:15px';
+ wrap.append(img);wrap.append(el('p','ภาพประกอบหน้าจบเกม — ใช้ปุ่มจริงด้านล่างเพื่อดูคะแนนและเล่นต่อ','muted'));
+ // Real text remains selectable and correct even if the artwork text is not.
+ const detail=el('div','','gesoc-final-correct');
+ detail.style.cssText='padding:12px 8px;text-align:center;background:#e8f7ee;border-radius:14px;margin-top:10px;color:#173a2a;line-height:1.65';
+ detail.append(el('h3','🎓 2 หลักสูตรที่อยากให้จำ'));
+ detail.append(el('p','การจัดการภูมิสังคม — เรียนรู้คน ชุมชน และพื้นที่ เพื่อพัฒนาสังคมอย่างยั่งยืน'));
+ detail.append(el('p','การจัดการภูมิวัฒนธรรม — เรียนรู้คุณค่าวัฒนธรรม เพื่ออนุรักษ์และต่อยอดสู่อนาคต'));
+ wrap.append(detail);return wrap;
 }
 function gesocFinalReview(){
- clearPanel();panel.append(el('h2','🏆 ยินดีด้วย! ผ่านครบ 6 ด่านแล้ว'),gesocFinalPrograms(),el('h3','🧠 ทบทวนชื่อหลักสูตร 2 ข้อก่อนรับคะแนน'));
+ clearPanel();panel.append(el('h2','🧠 ทบทวนชื่อหลักสูตร 2 ข้อ'),el('h3','เลือกหลักสูตรที่ตรงกับสถานการณ์'));
  const tests=[
  {q:'อยากเรียนรู้การใช้ข้อมูลพื้นที่เพื่อช่วยชุมชนรับมือน้ำท่วม ควรนึกถึงหลักสูตรใด?',c:0},
  {q:'อยากเรียนรู้การจัดการมรดก ภูมิปัญญา และอัตลักษณ์ท้องถิ่น ควรนึกถึงหลักสูตรใด?',c:1}
@@ -378,16 +391,16 @@ function quizScreen(){
   if(finished)return;
   finished=true;locked=true;keys.left=false;keys.right=false;
   const d=levels[li];clearPanel();
-  panel.append(el('p',`🏁 ผ่านเส้นชัยด่าน ${li+1}/6`,'eyebrow'),el('h2',`🧠 ภารกิจความรู้: ${d.name}`),el('h3',`${gesocInfoForStage(li).emoji} เชื่อมโยงกับ ${gesocInfoForStage(li).name}`),el('p',d.lesson),el('p',d.question));
+  panel.append(el('p',`ด่าน ${li+1}/6 · ${d.name}`,'eyebrow'),el('h3',`🌱 ภารกิจนี้เกี่ยวกับ ${gesocInfoForStage(li).name}`),el('p',d.question));
   const feedback=el('p','','feedback');panel.append(feedback);
   const choices=d.options.map((answer,i)=>button(`${String.fromCharCode(65+i)}. ${answer}`,()=>{
     choices.forEach(b=>b.disabled=true);
     if(i===d.correct){score+=100+(li*20);feedback.textContent=`✅ ตอบถูก! +${100+li*20} คะแนน`;sfx('coin');}
-    else {feedback.textContent=`❌ คำตอบที่เหมาะสมคือ: ${d.options[d.correct]}`;score=Math.max(0,score-20);}
+    else {feedback.textContent=`❌ ยังไม่ถูก · เฉลยข้อ ${String.fromCharCode(65+d.correct)}: ${d.options[d.correct]}`;score=Math.max(0,score-20);}
     setHUD();
-    panel.append(el('p',`📘 จำไว้: ${gesocInfoForStage(li).name} — ${gesocInfoForStage(li).desc}`));
+    
     panel.append(button(li===levels.length-1?'🎓 รู้จัก 2 หลักสูตร':'🌱 ไปด่านถัดไป →',()=>{
-      if(li===levels.length-1){gesocFinalReview()}
+      if(li===levels.length-1){endScreen(true)}
       else {li++;prepareLevel()}
     },'btn primary'));
   },'btn'));
@@ -397,6 +410,7 @@ function endScreen(win){
  locked=true;clearPanel();
  panel.append(el('h2',win?'🏆 ภารกิจ Gesoc สำเร็จ!':'💔 พลังหมดแล้ว'),...(win?[gesocFinalPrograms()]:[]),el('p',`คะแนนจริง ${score} คะแนน`),el('p',`ชื่อเล่น: ${gesocNickname||'ไม่ระบุ'} • โรงเรียน: ${gesocSchool} • จังหวัด: ${gesocProvince}`));
  gesocSubmit(win?'completed':'gameover',win?6:li);
+ if(win)panel.append(button('🧠 ทบทวนชื่อหลักสูตร 2 ข้อ',gesocFinalReview,'btn'));
  panel.append(button('↻ เล่นใหม่',()=>{if(gesocSchool)newGame();else gesocFormStart()},'btn primary'));
  panel.append(button('👤 เปลี่ยนผู้เล่น / กรอกข้อมูลใหม่',()=>{gesocPlayerId='';gesocSchool='';gesocProvince='';gesocNickname='';gesocFormStart()},'btn'));
 }
