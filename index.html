@@ -125,7 +125,7 @@ function prepareLevel(){
  for(const p of d.platforms)coins.push({x:p[0]+p[2]/2,y:p[1]-30,taken:false});
  // Real moving platforms added near existing gaps. They move vertically and can carry the player.
  movePlatforms=li===0?[{x:475,y:350,base:350,w:100,h:16,phase:0,lastY:350},{x:1193,y:326,base:326,w:92,h:16,phase:1.6,lastY:326}]:[{x:designs[li].gaps[0][0]+15,y:345,base:345,w:90,h:16,phase:0,lastY:345}];
- enemies=[300,760,1280,1740].filter(x=>onGround(x)).map((x,i)=>({x,y:FLOOR-40,w:39,h:40,origin:x,dir:i%2?1:-1,alive:true}));
+ enemies=[310,745,1070,1360,1740,1930].filter(x=>onGround(x)&&onGround(x+46)).map((x,i)=>({x,y:FLOOR-44,w:44,h:44,origin:x,dir:i%2?1:-1,alive:true}));
  // Challenging but fair: seeded obstacles on verified solid ground, with a clear starting area.
  const placements=[290,375,690,795,915,1030,1375,1515,1720,1860,1990];
  const safe=(x,w=48)=>onGround(x-5)&&onGround(x+w+5)&&x>190&&x<WORLD-120;
@@ -306,7 +306,22 @@ function draw(){
   for(let x=210;x<WORLD-60;x+=310){if(onGround(x))emoji(levels[li].icon,x,FLOOR-110,43)}
   for(const c of coins){if(c.taken)continue;ctx.beginPath();ctx.fillStyle='#ffce3f';ctx.arc(c.x,c.y,12,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#fff4b0';ctx.lineWidth=2;ctx.stroke();emoji('★',c.x,c.y+5,15)}
   if(cpActive||!cpActive){const xx=safeCheckpoint();ctx.fillStyle=cpActive?'#3e8f4d':'#8fa5b8';ctx.fillRect(xx,FLOOR-54,12,54);ctx.fillStyle=cpActive?'#ffe579':'#eef7ff';ctx.beginPath();ctx.moveTo(xx+12,FLOOR-54);ctx.lineTo(xx+52,FLOOR-42);ctx.lineTo(xx+12,FLOOR-28);ctx.closePath();ctx.fill();if(cpActive)emoji('✓',xx+31,FLOOR-38,19)}
-  for(const e of enemies){if(!e.alive)continue;ctx.fillStyle='#d85b5b';ctx.beginPath();ctx.roundRect(e.x,e.y,e.w,e.h,8);ctx.fill();emoji(li%2?'🔥':'⚠️',e.x+18,e.y+25,20)}
+  for(const e of enemies){
+    if(!e.alive)continue;
+    // Animated horned monster: hitbox stays 44x44 so the player can jump over or stomp it.
+    const bounce=Math.sin(frame*.12+e.origin)*2;
+    const ex=e.x,ey=e.y+bounce;
+    ctx.save();ctx.shadowColor='#4b155d';ctx.shadowBlur=8;
+    ctx.fillStyle=li%2?'#8d45d9':'#e94780';
+    ctx.beginPath();ctx.moveTo(ex+5,ey+16);ctx.lineTo(ex+4,ey+1);ctx.lineTo(ex+18,ey+11);ctx.lineTo(ex+26,ey+11);ctx.lineTo(ex+40,ey+1);ctx.lineTo(ex+39,ey+16);ctx.closePath();ctx.fill();
+    ctx.fillStyle=li%2?'#6e2bbd':'#cf2b68';
+    ctx.beginPath();ctx.roundRect(ex+2,ey+11,40,31,14);ctx.fill();ctx.shadowBlur=0;
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(ex+14,ey+24,7,9,0,0,Math.PI*2);ctx.ellipse(ex+30,ey+24,7,9,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#151d37';ctx.beginPath();ctx.arc(ex+16,ey+25,3.3,0,Math.PI*2);ctx.arc(ex+28,ey+25,3.3,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#fff1f1';ctx.beginPath();ctx.moveTo(ex+16,ey+34);ctx.lineTo(ex+20,ey+39);ctx.lineTo(ex+24,ey+34);ctx.lineTo(ex+28,ey+39);ctx.lineTo(ex+32,ey+34);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#472750';ctx.fillRect(ex+8,ey+40,9,4);ctx.fillRect(ex+27,ey+40,9,4);
+    ctx.restore();
+  }
   // Bright high-contrast enemies with faces and danger indicators.
   for(const h of stageHazards){
     const active=h.type==='spikes'||Math.sin((frame+h.phase)*(.045+li*.003))>.05;
