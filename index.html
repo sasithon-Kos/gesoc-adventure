@@ -26,7 +26,7 @@ canvas{box-shadow:0 18px 42px #09192c80}
 <canvas id="game" width="960" height="500" aria-label="เกมผจญภัยไปกับน้อง Gesoc"></canvas>
 <div class="controls"><div class="pad"><button type="button" id="left" class="ctrl" aria-label="เดินซ้าย">◀</button><button type="button" id="right" class="ctrl" aria-label="เดินขวา">▶</button></div><div class="right-pad"><button type="button" id="dash" class="ctrl" aria-label="พุ่งตัว">⚡ พุ่ง</button><button type="button" id="kick" class="ctrl" aria-label="กระโดดถีบปีศาจ">🦶 ถีบ</button><button type="button" id="skill" class="ctrl" aria-label="ใช้โล่ป้องกัน">🛡️ โล่</button><button type="button" id="jump" class="ctrl">⬆ กระโดด</button></div></div>
 <div class="tools"><button class="small" type="button" id="restart">↻ เริ่มใหม่</button><button class="small" type="button" id="how">? วิธีเล่น</button><button class="small" type="button" id="sound" aria-pressed="true">🔊 เปิดเสียง</button></div>
-<div class="note">มือถือ: ◀ ▶ กระโดดสองชั้น 🦶ถีบกลางอากาศ ⚡พุ่ง และโล่ • คอมพิวเตอร์: A/D, Space ×2, Z พุ่ง, K ถีบ, X โล่ • By : Sasi</div>
+<div class="note">มือถือ: ◀ ▶ กระโดดสองชั้น 🦶ถีบ (กดครั้งเดียวกระโดดพุ่งถีบ) ⚡พุ่ง และโล่ • คอมพิวเตอร์: A/D, Space ×2, Z พุ่ง, K ถีบกระโดด, X โล่ • By : Sasi</div>
 <div id="overlay"><section class="panel" id="panel"></section></div>
 <script>
 'use strict';
@@ -230,8 +230,8 @@ function startScreen(){
  const guide=el('div','','gesoc-howto');
  guide.style.cssText='margin-top:14px;border-radius:15px;background:#eff7ff;padding:13px 16px;color:#23415d;font-size:14px;line-height:1.7';
  guide.append(el('strong','🎮 วิธีเล่น'));
- guide.append(el('p','มือถือ: ◀ ▶ เดิน | ⬆ กระโดด (กดสองครั้งเพื่อกระโดดสองชั้น) | ⚡ พุ่ง | 🦶 ถีบกลางอากาศ | 🛡️ ใช้โล่'));
- guide.append(el('p','คอมพิวเตอร์: A/D หรือ ←/→ เดิน | Space กระโดด | Z พุ่ง | K ถีบกลางอากาศ | X ใช้โล่'));
+ guide.append(el('p','มือถือ: ◀ ▶ เดิน | ⬆ กระโดด (กดสองครั้งเพื่อกระโดดสองชั้น) | ⚡ พุ่ง | 🦶 ถีบกระโดดโจมตี | 🛡️ ใช้โล่'));
+ guide.append(el('p','คอมพิวเตอร์: A/D หรือ ←/→ เดิน | Space กระโดด | Z พุ่ง | K ถีบกระโดด | X ใช้โล่'));
  guide.append(el('p','เก็บเหรียญเพื่อเพิ่มคะแนน หลบหลุมและปีศาจ ใช้ท่ากระโดดถีบโจมตี ไปถึงธงเส้นชัยแล้วตอบคำถามเพื่อเข้าสู่ด่านต่อไป'));
  for(const p of guide.querySelectorAll('p'))p.style.cssText='margin:6px 0';
  panel.append(guide);
@@ -246,12 +246,15 @@ function jump(){
  if(isSecond)for(let i=0;i<12;i++)sparkles.push({x:player.x+23,y:player.y+44,vx:(Math.random()-.5)*5,vy:Math.random()*3,life:22});
 }
 function airKick(){
- if(locked||!player||player.ground||kickCooldown>0||kickFrames>0)return;
- kickFrames=18;kickCooldown=48;kickHits.clear();
- // Short forward aerial lunge. Hitbox is in the facing direction, not on the full hero illustration.
- player.vx=dashDir*7;player.vy=Math.min(player.vy,1.5);sfx('dash');
-}
-function kickBox(){return {x:dashDir>0?player.x+player.w-4:player.x-38,y:player.y+8,w:42,h:31}}
+  if(locked||!player||kickCooldown>0||kickFrames>0)return;
+  // A single tap works even from the ground: hop forward then kick.
+  if(player.ground){player.y-=5;player.vy=-8.8;player.ground=false;player.jumps=Math.max(1,player.jumps);}
+  kickFrames=24;kickCooldown=42;kickHits.clear();
+  player.vx=dashDir*8.7;player.vy=Math.min(player.vy,-1.5);
+  for(let i=0;i<8;i++)sparkles.push({x:player.x+player.w/2+dashDir*30,y:player.y+player.h/2,vx:dashDir*(1+Math.random()*3),vy:(Math.random()-.5)*4,life:15});
+  sfx('dash');
+ }
+ function kickBox(){return {x:dashDir>0?player.x+player.w-5:player.x-64,y:player.y+2,w:69,h:player.h-4}}
 function kickDefeat(target,points){
  if(kickHits.has(target))return;
  kickHits.add(target);target.alive=false;score+=points;player.vy=-7.8;player.inv=Math.max(player.inv,9);
