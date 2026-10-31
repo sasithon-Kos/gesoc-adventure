@@ -134,7 +134,7 @@ function prepareLevel(){
    else stageHazards.push({x,y:FLOOR-35,w:52,h:35,type:li>=2&&i%3===0?'laser':'spikes',phase:i*36});
  });
  // Aerial drones demand timed jumping: their motion and hitbox are displayed visibly.
- stageDrones=[650,1110,1580,1900].filter(x=>safe(x,30)).slice(0,1+Math.floor(li/2)).map((x,i)=>({x,baseY:FLOOR-115,y:FLOOR-115,w:45,h:42,phase:i*1.8}));
+ stageDrones=[650,1110,1580,1900].slice(0,Math.min(4,1+Math.floor(li/2))).map((x,i)=>({x,baseY:FLOOR-125-(i%2)*22,y:FLOOR-125-(i%2)*22,w:45,h:42,phase:i*1.8}));
  // Additional life and shield pickups in accessible spots.
  bonusItems=[{x:735,y:FLOOR-91,type:'heart',taken:false},{x:1530,y:FLOOR-95,type:'shield',taken:false}].filter(b=>onGround(b.x));
  overlay.classList.add('hidden');setHUD()
@@ -295,6 +295,7 @@ function drawStageBackdrop(theme){
  ctx.fillStyle='rgba(255,255,255,.09)';ctx.beginPath();ctx.arc(W*0.18,H*0.22,95,0,Math.PI*2);ctx.fill();
  ctx.beginPath();ctx.arc(W*0.84,H*0.25,70,0,Math.PI*2);ctx.fill();
 }
+const floatingGhost=new Image();floatingGhost.src='assets/ghost_floating.png';
 function draw(){
   const heroLabel=document.getElementById('gesocName');if(heroLabel)heroLabel.textContent=gesocNames[li]||gesocNames[0];
   drawStageBackdrop(stageThemes[li]||stageThemes[0]);
@@ -334,9 +335,21 @@ function draw(){
       else{ctx.fillStyle='#ffbb48';ctx.fillRect(h.x+19,FLOOR-30,10,22);}
     }ctx.restore();
   }
+  // Neon shadow ghosts float in the air. The glowing sprite is intentionally
+  // much larger than its 45x42 collision box, so it is easy to see.
   for(const d of stageDrones){
-    ctx.save();ctx.shadowBlur=14;ctx.shadowColor='#ff2f64';ctx.fillStyle='#b52b62';ctx.beginPath();ctx.roundRect(d.x,d.y,d.w,d.h,12);ctx.fill();ctx.shadowBlur=0;
-    emoji('👾',d.x+d.w/2,d.y+30,31);ctx.restore();
+    ctx.save();
+    const bob=Math.sin(frame*.06+d.phase)*4;
+    const cx=d.x+d.w/2,cy=d.y+d.h/2+bob;
+    ctx.shadowColor='#00f6ff';ctx.shadowBlur=20;
+    if(floatingGhost.complete&&floatingGhost.naturalWidth){
+      const size=78+li*2;
+      ctx.drawImage(floatingGhost,cx-size/2,cy-size*.60,size,size);
+    } else {
+      ctx.fillStyle='#31126e';ctx.beginPath();ctx.arc(cx,cy,27,0,Math.PI*2);ctx.fill();
+      ctx.shadowBlur=0;emoji('👻',cx,cy+11,43);
+    }
+    ctx.restore();
   }
   // Clearly marked goal; touching the far right edge opens the knowledge quiz.
   const goalX=WORLD-100;
