@@ -227,6 +227,7 @@ function startScreen(){
  panel.append(el('h2','ผจญภัยไปกับน้อง Gesoc'));
  panel.append(el('p','ออกผจญภัยผ่าน 6 ด่าน สำรวจพื้นที่ เรียนรู้ชุมชนและสิ่งแวดล้อม เก็บคะแนน และตอบคำถามเพื่อปลดล็อกด่านถัดไป'));
  panel.append(button('🎮 เริ่มผจญภัย',gesocFormStart,'btn primary'));
+ panel.append(button('📋 ผู้สอน: ดูคำถามและเฉลยทั้ง 6 ด่าน',gesocTeacherQuestions,'btn'));
  const guide=el('div','','gesoc-howto');
  guide.style.cssText='margin-top:14px;border-radius:15px;background:#eff7ff;padding:13px 16px;color:#23415d;font-size:14px;line-height:1.7';
  guide.append(el('strong','🎮 วิธีเล่น'));
@@ -290,19 +291,68 @@ function update(dt){if(locked)return;frame+=dt;
  sparkles=sparkles.filter(p=>p.life>0);for(const p of sparkles){p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt}
  camera+=((Math.min(WORLD-W,Math.max(0,player.x-265)))-camera)*Math.min(.2,dt*.12);
  if(player.x>=WORLD-105){locked=true;sfx('level');quizScreen()}}
+const gesocProgramInfo={
+ social:{name:'การจัดการภูมิสังคม',desc:'เรียนรู้คน ชุมชน พื้นที่ ทรัพยากร และการวางแผนพัฒนาอย่างยั่งยืน',emoji:'🌿'},
+ culture:{name:'การจัดการภูมิวัฒนธรรม',desc:'เรียนรู้วัฒนธรรม อัตลักษณ์ ภูมิปัญญา และการดูแลพื้นที่มรดกชุมชน',emoji:'🎭'},
+ both:{name:'สองหลักสูตร เรียนรู้พื้นที่ร่วมกัน',desc:'เทคโนโลยีแผนที่และข้อมูลพื้นที่ช่วยการทำงานกับชุมชนและวัฒนธรรมได้',emoji:'🗺️'}
+};
+function gesocInfoForStage(index){return gesocProgramInfo[levels[index].focus]}
+function gesocTeacherQuestions(){
+ clearPanel();panel.append(el('h2','📋 ดูคำถามและเฉลยทั้ง 6 ด่าน'),el('p','สำหรับผู้ดูแลและผู้สอน — ดูได้โดยไม่ต้องเล่นผ่านด่าน'));
+ levels.forEach((d,i)=>{
+  const wrap=el('div','','gesoc-edu-card');wrap.style.cssText='background:#f4f9ff;border:1px solid #d7e5f4;border-radius:14px;padding:13px;margin:10px 0;color:#16324c';
+  wrap.append(el('h3',`${d.icon} ด่าน ${i+1}: ${d.name}`),el('p',`หลักสูตร: ${gesocInfoForStage(i).name}`),el('p',d.question));
+  d.options.forEach((answer,j)=>wrap.append(el('p',`${j===d.correct?'✅':'▫️'} ${String.fromCharCode(65+j)}. ${answer}`)));
+  wrap.append(el('p',`💡 ${d.lesson}`));panel.append(wrap);
+ });
+ panel.append(button('← กลับหน้าแรก',startScreen,'btn primary'));
+}
+function gesocFinalPrograms(){
+ const container=el('div','','gesoc-program-summary');container.style.cssText='background:#eef8f1;border:2px solid #abdfb9;border-radius:18px;padding:16px;margin:12px 0;color:#153e30;line-height:1.65';
+ container.append(el('h2','🎓 จำ 2 ชื่อหลักสูตรนี้ให้ได้!'),el('p','วิทยาลัยโพธิวิชชาลัย มหาวิทยาลัยศรีนครินทรวิโรฒ'));
+ for(const p of [gesocProgramInfo.social,gesocProgramInfo.culture]){
+  const block=el('div','','gesoc-program-box');block.style.cssText='background:white;border-radius:12px;margin:10px 0;padding:12px';
+  block.append(el('h3',`${p.emoji} ${p.name}`),el('p',p.desc));container.append(block);
+ }
+ container.append(el('p','🌍 จำง่าย: ภูมิสังคม = คน + ชุมชน + พื้นที่ | ภูมิวัฒนธรรม = วัฒนธรรม + อัตลักษณ์ + พื้นที่'));
+ return container;
+}
+function gesocFinalReview(){
+ clearPanel();panel.append(el('h2','🏆 ยินดีด้วย! ผ่านครบ 6 ด่านแล้ว'),gesocFinalPrograms(),el('h3','🧠 ทบทวนชื่อหลักสูตร 2 ข้อก่อนรับคะแนน'));
+ const tests=[
+ {q:'อยากเรียนรู้การใช้ข้อมูลพื้นที่เพื่อช่วยชุมชนรับมือน้ำท่วม ควรนึกถึงหลักสูตรใด?',c:0},
+ {q:'อยากเรียนรู้การจัดการมรดก ภูมิปัญญา และอัตลักษณ์ท้องถิ่น ควรนึกถึงหลักสูตรใด?',c:1}
+ ];
+ let pos=0;
+ const area=el('div','','gesoc-review');panel.append(area);
+ function render(){
+  area.replaceChildren();
+  if(pos>=tests.length){area.append(el('h3','🎉 ภารกิจความรู้สำเร็จ!'),el('p','คุณรู้จักการจัดการภูมิสังคมและการจัดการภูมิวัฒนธรรมแล้ว'),button('🏆 ดูคะแนนและจบเกม',()=>endScreen(true),'btn primary'));return}
+  const t=tests[pos];area.append(el('p',`ข้อ ${pos+1}/2: ${t.q}`));
+  const feedback=el('p','','feedback');
+  [gesocProgramInfo.social,gesocProgramInfo.culture].forEach((p,i)=>area.append(button(`${i+1}. ${p.name}`,()=>{
+    area.querySelectorAll('button').forEach(b=>b.disabled=true);
+    feedback.textContent=i===t.c?'✅ ถูกต้อง! จำชื่อหลักสูตรได้แล้ว':`💡 คำตอบที่เหมาะสมคือ ${[gesocProgramInfo.social,gesocProgramInfo.culture][t.c].name}`;
+    area.append(button(pos===1?'✅ เสร็จสิ้น':'➡️ ข้อถัดไป',()=>{pos++;render()},'btn primary'));
+  },'btn')));
+  area.append(feedback);
+ }
+ render();
+}
 function quizScreen(){
   if(finished)return;
   finished=true;locked=true;keys.left=false;keys.right=false;
   const d=levels[li];clearPanel();
-  panel.append(el('p',`🏁 ผ่านเส้นชัยด่าน ${li+1}/6`,'eyebrow'),el('h2',`🧠 ภารกิจความรู้: ${d.name}`),el('p',d.lesson),el('p',d.question));
+  panel.append(el('p',`🏁 ผ่านเส้นชัยด่าน ${li+1}/6`,'eyebrow'),el('h2',`🧠 ภารกิจความรู้: ${d.name}`),el('h3',`${gesocInfoForStage(li).emoji} เชื่อมโยงกับ ${gesocInfoForStage(li).name}`),el('p',d.lesson),el('p',d.question));
   const feedback=el('p','','feedback');panel.append(feedback);
   const choices=d.options.map((answer,i)=>button(`${String.fromCharCode(65+i)}. ${answer}`,()=>{
     choices.forEach(b=>b.disabled=true);
     if(i===d.correct){score+=100+(li*20);feedback.textContent=`✅ ตอบถูก! +${100+li*20} คะแนน`;sfx('coin');}
     else {feedback.textContent=`❌ คำตอบที่เหมาะสมคือ: ${d.options[d.correct]}`;score=Math.max(0,score-20);}
     setHUD();
-    panel.append(button(li===levels.length-1?'🏆 ดูผลการผจญภัย':'🌱 ไปด่านถัดไป →',()=>{
-      if(li===levels.length-1){endScreen(true)}
+    panel.append(el('p',`📘 จำไว้: ${gesocInfoForStage(li).name} — ${gesocInfoForStage(li).desc}`));
+    panel.append(button(li===levels.length-1?'🎓 รู้จัก 2 หลักสูตร':'🌱 ไปด่านถัดไป →',()=>{
+      if(li===levels.length-1){gesocFinalReview()}
       else {li++;prepareLevel()}
     },'btn primary'));
   },'btn'));
@@ -310,7 +360,7 @@ function quizScreen(){
 }
 function endScreen(win){
  locked=true;clearPanel();
- panel.append(el('h2',win?'🏆 ภารกิจ Gesoc สำเร็จ!':'💔 พลังหมดแล้ว'),el('p',`คะแนนจริง ${score} คะแนน`),el('p',`ชื่อเล่น: ${gesocNickname||'ไม่ระบุ'} • โรงเรียน: ${gesocSchool} • จังหวัด: ${gesocProvince}`));
+ panel.append(el('h2',win?'🏆 ภารกิจ Gesoc สำเร็จ!':'💔 พลังหมดแล้ว'),...(win?[gesocFinalPrograms()]:[]),el('p',`คะแนนจริง ${score} คะแนน`),el('p',`ชื่อเล่น: ${gesocNickname||'ไม่ระบุ'} • โรงเรียน: ${gesocSchool} • จังหวัด: ${gesocProvince}`));
  gesocSubmit(win?'completed':'gameover',win?6:li);
  panel.append(button('↻ เล่นใหม่',()=>{if(gesocSchool)newGame();else gesocFormStart()},'btn primary'));
  panel.append(button('👤 เปลี่ยนผู้เล่น / กรอกข้อมูลใหม่',()=>{gesocPlayerId='';gesocSchool='';gesocProvince='';gesocNickname='';gesocFormStart()},'btn'));
